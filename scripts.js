@@ -1,75 +1,74 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbzeswBCRgi6a-LLqXY2gMjVPlhF7I7MQCvE6beNy4Jo1UvoDy8nrP8wPSti4ekivpr35g/exec'; // Replace with your Web App URL
+    document.getElementById('saveButton').addEventListener('click', updateQuantity);
+    loadProducts();
+});
 
-    // Function to load data from Google Apps Script (GET request)
-    function loadProducts() {
-        fetch(scriptUrl + '?action=load')  // Ensure your URL includes the proper query parameters
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    displayProducts(data.data); // Function to display the data in your UI
-                } else {
-                    console.error('Error loading data:', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
+async function updateQuantity() {
+    const name = document.getElementById('productName').value.trim().toUpperCase();
+    const location = document.getElementById('location').value;
+    const quantity = parseFloat(document.getElementById('quantity').value);
+
+    if (!name || isNaN(quantity)) {
+        alert('Please enter valid product details.');
+        return;
     }
 
-    // Function to save data to Google Apps Script (POST request)
-    function saveData(data) {
-        fetch(scriptUrl, {
+    // Send data to Google Apps Script for processing
+    try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbxONxZ1mcXtwFRFuFDn0gQKng_EFeA1-N1RC-EhTZbe2-Bas1Ab9fOtAMentjcTnlye-g/exec', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data), // Send the data as JSON
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                console.log('Data saved successfully:', data);
-                loadProducts(); // Reload the products after saving new data
-            } else {
-                console.error('Error saving data:', data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error saving data:', error);
+            body: JSON.stringify({ name, [location]: quantity }) 
         });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        if (data.result === 'success') {
+            loadProducts(); // Refresh product list after successful update
+            clearForm();
+        } else {
+            alert('Error updating product: ' + data.message);
+        }
+    } catch (error) {
+        alert('Error updating product: ' + error.message);
     }
+}
 
-    // Function to display the products in the frontend (you can customize this)
-    function displayProducts(products) {
-        const productList = document.getElementById('productList');
-        productList.innerHTML = ''; // Clear the existing list
-        products.forEach(product => {
-            const productRow = document.createElement('tr');
-            productRow.innerHTML = `<td>${product[0]}</td><td>${product[1]}</td><td>${product[2]}</td>`;
-            productList.appendChild(productRow);
-        });
+async function loadProducts() {
+    try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbxONxZ1mcXtwFRFuFDn0gQKng_EFeA1-N1RC-EhTZbe2-Bas1Ab9fOtAMentjcTnlye-g/exec/getData'); // Assuming you have a separate function in your Apps Script to retrieve data
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const productsData = await response.json(); 
+        displayProducts(productsData); 
+    } catch (error) {
+        alert('Error loading products: ' + error.message);
     }
+}
 
-    // Ensure the form's submit button is functioning
-    const submitForm = document.getElementById('submitForm');
-    if (submitForm) {
-        submitForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-            const product = document.getElementById('product').value;
-            const quantity = document.getElementById('quantity').value;
+function displayProducts(productsData) {
+    const productTable = document.getElementById('productTable');
+    productTable.innerHTML = ''; 
 
-            if (product && quantity) {
-                const data = { product: product, quantity: quantity };
-                saveData(data);
-            } else {
-                console.log('Please fill in both fields.');
-            }
-        });
-    } else {
-        console.error('Form with ID submitForm not found!');
-    }
+    productsData.forEach(product => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${product.name}</td>
+            <td>${product.home}</td>
+            <td>${product.warehouse}</td>
+            <td>${product.home + product.warehouse}</td>
+        `;
+        productTable.appendChild(row);
+    });
+}
 
-    // Initial load of products when the page is loaded
-    loadProducts(); // Fetch products when the page loads
-});
+function clearForm() {
+    document.getElementById('productName').value = '';
+    document.getElementById('quantity').value = '';
+}
