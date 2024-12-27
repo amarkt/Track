@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbwPkxzym5ce4kI_F3QUwWLJCgpU662eAEs0RbBG6aXJHHDk0Bj6fQYhxJ1lh_Ul75S5tA/exec'; // Replace with your Web App URL
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbzWuaXaegOtMmHE-dnA0666CULd-i2LbDC766e2KfRc82SVZ-7L4p0VzlEq_jKqfVHIww/exec'; // Replace with your Web App URL
 
     // Function to load data from Google Apps Script (GET request)
     function loadProducts() {
