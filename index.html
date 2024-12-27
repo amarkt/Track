@@ -3,100 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline Inventory Tracker</title>
-    <style nonce="randomValue12345">
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input, select, button {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-        button {
-            background-color: #28a745;
-            color: #fff;
-            cursor: pointer;
-            border: none;
-            padding: 10px;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-    </style>
+    <title>Product Tracker</title>
 </head>
 <body>
-    <h1>Offline Inventory Tracker</h1>
-    <div class="container">
-        <h3>Add or Update Product</h3>
-        <label for="productName">Product Name:</label>
-        <input id="productName" placeholder="Enter product name" required>
-        
-        <label for="location">Location:</label>
-        <select id="location">
-            <option value="home">Home</option>
-            <option value="warehouse">Warehouse</option>
-        </select>
-        
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" placeholder="Enter quantity" step="0.01" required>
+    <h1>Product Tracker</h1>
 
-        <button id="saveButton">Save</button>
-        
-        <h3>Product List</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Product Name</th>
-                    <th>Home Quantity</th>
-                    <th>Warehouse Quantity</th>
-                    <th>Total Quantity</th>
-                </tr>
-            </thead>
-            <tbody id="productTable">
-                <!-- Product rows will appear here -->
-            </tbody>
-        </table>
-    </div>
+    <!-- Form to enter product and quantity -->
+    <form id="submitForm">
+        <input type="text" id="product" placeholder="Product Name" required>
+        <input type="number" id="quantity" placeholder="Quantity" required>
+        <button type="submit">Save</button>
+    </form>
 
-    <!-- External JavaScript -->
-    <script nonce="randomValue12345" src="scripts.js"></script>
+    <!-- Table to display products -->
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Date Added</th>
+            </tr>
+        </thead>
+        <tbody id="productList"></tbody>
+    </table>
+
+    <!-- Include your script here -->
+    <script src="scripts.js" nonce="randomValue12345"></script>
 </body>
 </html>
