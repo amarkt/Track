@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline Inventory Tracker</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://script.google.com https://script.googleusercontent.com;">
+
+    <meta id="nonce" name="nonce" content="nonce-randomValue12345">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-randomValue12345'; style-src 'self' 'nonce-randomValue12345'; connect-src 'self' https://script.google.com https://script.googleusercontent.com;">
 
 <!--    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://script.google.com;"> -->
     <style>
