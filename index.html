@@ -4,13 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline Inventory Tracker</title>
-
-    <meta id="nonce" name="nonce" content="nonce-randomValue12345">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-randomValue12345'; style-src 'self' 'nonce-randomValue12345'; connect-src 'self' https://script.google.com https://script.googleusercontent.com;">
-
-<!--    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://script.google.com;"> -->
-  
-    <!-- Inline Styles with Nonce -->
     <style nonce="randomValue12345">
         body {
             font-family: Arial, sans-serif;
@@ -68,7 +61,6 @@
             background-color: #f4f4f4;
         }
     </style>
-
 </head>
 <body>
     <h1>Offline Inventory Tracker</h1>
@@ -86,7 +78,7 @@
         <label for="quantity">Quantity:</label>
         <input type="number" id="quantity" placeholder="Enter quantity" step="0.01" required>
 
-        <button onclick="updateQuantity()">Save</button>
+        <button id="saveButton">Save</button>
         
         <h3>Product List</h3>
         <table>
@@ -104,91 +96,7 @@
         </table>
     </div>
 
-    <!-- Inline Script with Nonce -->
-    <script nonce="randomValue12345">
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpwf_jwyMjeln4ca7anZZohxXD8eneyzNuL5pylsSIy6hv4CuEeV2xLTSGir2tiaXIEQ/exec';
-        let products = [];
-
-        // Fetch data from Google Sheets
-        async function fetchData() {
-            try {
-                const response = await fetch(SCRIPT_URL);
-                if (!response.ok) throw new Error('Failed to fetch data');
-                products = await response.json();
-                displayProducts();
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        }
-
-        // Save data to Google Sheets
-        async function saveData() {
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(products),
-                });
-                if (!response.ok) throw new Error('Failed to save data');
-            } catch (error) {
-                console.error('Error saving data:', error);
-            }
-        }
-
-        // Update quantity for a product
-        function updateQuantity() {
-            const name = document.getElementById('productName').value.trim().toUpperCase();
-            const location = document.getElementById('location').value;
-            const quantity = parseFloat(document.getElementById('quantity').value);
-
-            if (!name || isNaN(quantity)) {
-                alert('Please enter valid product details.');
-                return;
-            }
-
-            const productIndex = products.findIndex(p => p.name === name);
-            if (productIndex > -1) {
-                // Update existing product
-                products[productIndex][location] += quantity;
-            } else {
-                // Add new product
-                const newProduct = { name, home: 0, warehouse: 0 };
-                newProduct[location] = quantity;
-                products.push(newProduct);
-            }
-
-            saveData();
-            displayProducts();
-            clearForm();
-        }
-
-        // Display products in the table
-        function displayProducts() {
-            const productTable = document.getElementById('productTable');
-            productTable.innerHTML = ''; // Clear previous rows
-
-            products.forEach(product => {
-                const total = product.home + product.warehouse;
-                const row = `
-                    <tr>
-                        <td>${product.name}</td>
-                        <td>${product.home.toFixed(2)}</td>
-                        <td>${product.warehouse.toFixed(2)}</td>
-                        <td>${total.toFixed(2)}</td>
-                    </tr>
-                `;
-                productTable.insertAdjacentHTML('beforeend', row);
-            });
-        }
-
-        // Clear input form
-        function clearForm() {
-            document.getElementById('productName').value = '';
-            document.getElementById('quantity').value = '';
-        }
-
-        // Initial fetch
-        fetchData();
-    </script>
+    <!-- External JavaScript -->
+    <script nonce="randomValue12345" src="scripts.js"></script>
 </body>
 </html>
