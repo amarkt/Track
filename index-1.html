@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline Inventory Tracker</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://script.google.com;">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,14 +15,11 @@
         h1 {
             text-align: center;
             color: #333;
-            font-size: 1.5rem;
-            margin: 10px;
         }
         .container {
-            width: 95%;
-            max-width: 600px;
-            margin: 10px auto;
-            padding: 15px;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -29,22 +27,20 @@
         label {
             display: block;
             margin-bottom: 5px;
-            font-size: 0.9rem;
         }
-        input, select, button, datalist {
+        input, select, button {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            font-size: 0.9rem;
+            font-size: 1rem;
         }
         button {
             background-color: #28a745;
             color: #fff;
             cursor: pointer;
             border: none;
-            border-radius: 4px;
             padding: 10px;
         }
         button:hover {
@@ -53,49 +49,17 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 20px;
         }
         table, th, td {
             border: 1px solid #ddd;
         }
         th, td {
-            padding: 8px;
+            padding: 10px;
             text-align: center;
-            font-size: 0.8rem;
         }
         th {
             background-color: #f4f4f4;
-        }
-        .inline-input {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-        .arrow-btn {
-            background-color: #007bff;
-            color: white;
-            font-size: 1rem;
-            border: none;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            cursor: pointer;
-        }
-        .arrow-btn:hover {
-            background-color: #0056b3;
-        }
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 1.2rem;
-            }
-            input, select, button, table {
-                font-size: 0.8rem;
-            }
-            .arrow-btn {
-                width: 30px;
-                height: 30px;
-                font-size: 0.8rem;
-            }
         }
     </style>
 </head>
@@ -104,24 +68,19 @@
     <div class="container">
         <h3>Add or Update Product</h3>
         <label for="productName">Product Name:</label>
-        <input list="productList" id="productName" placeholder="Enter or select product name" required>
-        <datalist id="productList">
-            <!-- Dynamic options will appear here -->
-        </datalist>
-
+        <input id="productName" placeholder="Enter product name" required>
+        
         <label for="location">Location:</label>
         <select id="location">
             <option value="home">Home</option>
             <option value="warehouse">Warehouse</option>
         </select>
-
+        
         <label for="quantity">Quantity:</label>
         <input type="number" id="quantity" placeholder="Enter quantity" step="0.01" required>
 
-        <div class="inline-input">
-            <button class="arrow-btn" onclick="updateQuantityFromInput()">&rarr;</button>
-        </div>
-
+        <button onclick="updateQuantity()">Save</button>
+        
         <h3>Product List</h3>
         <table>
             <thead>
@@ -139,88 +98,89 @@
     </div>
 
     <script>
-        // Retrieve saved products from localStorage or initialize an empty array
-        let products = JSON.parse(localStorage.getItem('inventory')) || [];
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzaSSGUTyT4irycG-5zRrkfplLY_omnrf9HDfMV6mdfelZCpYvvAizbpSwpe7Ut5oCOTA/exec';  // Replace with your Apps Script URL
+        let products = [];
 
-        // Function to display products in the table
-        function displayProducts() {
-            const productTable = document.getElementById('productTable');
-            productTable.innerHTML = ''; // Clear existing rows
-
-            const groupedProducts = groupProducts();
-            groupedProducts.forEach(product => {
-                const row = `
-                    <tr>
-                        <td>${product.name}</td>
-                        <td>${product.home.toFixed(2)}</td>
-                        <td>${product.warehouse.toFixed(2)}</td>
-                        <td>${product.total.toFixed(2)}</td>
-                    </tr>
-                `;
-                productTable.insertAdjacentHTML('beforeend', row);
-            });
-            updateProductList();
+        // Fetch data from Google Sheets
+        async function fetchData() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                if (!response.ok) throw new Error('Failed to fetch data');
+                products = await response.json();
+                displayProducts();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
         }
 
-        // Group products by name and calculate totals for home and warehouse
-        function groupProducts() {
-            const grouped = {};
-            products.forEach(p => {
-                const upperName = p.name.toUpperCase();
-                if (!grouped[upperName]) {
-                    grouped[upperName] = { name: upperName, home: 0, warehouse: 0, total: 0 };
-                }
-                grouped[upperName][p.location] += p.quantity;
-                grouped[upperName].total += p.quantity;
-            });
-            return Object.values(grouped);
+        // Save data to Google Sheets
+        async function saveData(product) {
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(product),
+                });
+                if (!response.ok) throw new Error('Failed to save data');
+            } catch (error) {
+                console.error('Error saving data:', error);
+            }
         }
 
-        // Function to update quantity based on user input
-        function updateQuantityFromInput() {
+        // Update quantity for a product
+        function updateQuantity() {
             const name = document.getElementById('productName').value.trim().toUpperCase();
             const location = document.getElementById('location').value;
             const quantity = parseFloat(document.getElementById('quantity').value);
 
             if (!name || isNaN(quantity)) {
-                alert('Please enter a valid product name and quantity.');
+                alert('Please enter valid product details.');
                 return;
             }
 
-            // Find existing product entry
-            const existingIndex = products.findIndex(p => p.name.toUpperCase() === name && p.location === location);
-            if (existingIndex > -1) {
-                products[existingIndex].quantity = parseFloat((products[existingIndex].quantity + quantity).toFixed(2));
+            const productIndex = products.findIndex(p => p.name === name);
+            if (productIndex > -1) {
+                // Update existing product
+                products[productIndex][location] += quantity;
             } else {
-                // Add new entry if not found
-                products.push({ name, location, quantity });
+                // Add new product
+                const newProduct = { name, home: 0, warehouse: 0 };
+                newProduct[location] = quantity;
+                products.push(newProduct);
             }
 
-            saveAndDisplay();
-        }
-
-        // Function to save products to localStorage and refresh the table
-        function saveAndDisplay() {
-            localStorage.setItem('inventory', JSON.stringify(products));
+            saveData(products[productIndex] || products[products.length - 1]);
             displayProducts();
             clearForm();
         }
 
-        // Function to update the product list for the datalist
-        function updateProductList() {
-            const productList = document.getElementById('productList');
-            const uniqueProducts = [...new Set(products.map(p => p.name.toUpperCase()))];
-            productList.innerHTML = uniqueProducts.map(p => `<option value="${p}"></option>`).join('');
+        // Display products in the table
+        function displayProducts() {
+            const productTable = document.getElementById('productTable');
+            productTable.innerHTML = ''; // Clear previous rows
+
+            products.forEach(product => {
+                const total = product.home + product.warehouse;
+                const row = `
+                    <tr>
+                        <td>${product.name}</td>
+                        <td>${product.home.toFixed(2)}</td>
+                        <td>${product.warehouse.toFixed(2)}</td>
+                        <td>${total.toFixed(2)}</td>
+                    </tr>
+                `;
+                productTable.insertAdjacentHTML('beforeend', row);
+            });
         }
 
-        // Function to clear the input form
+        // Clear input form
         function clearForm() {
             document.getElementById('productName').value = '';
             document.getElementById('quantity').value = '';
         }
 
-        // Initial display of products
-        displayProducts();
+        // Initial fetch
+        fetchData();
     </script>
 </body>
 </html>
