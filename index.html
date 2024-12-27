@@ -3,31 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Tracker</title>
+    <title>Offline Inventory Tracker</title>
+    <style>
+        /* ... (existing CSS) ... */
+        .inventory-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        } 
+    </style>
 </head>
 <body>
-    <h1>Product Tracker</h1>
+    <h1>Offline Inventory Tracker</h1>
+    <div class="container">
+        <h3>Add or Update Product</h3>
+        <label for="productName">Product Name:</label>
+        <input id="productName" placeholder="Enter product name" required>
+        <label for="location">Location:</label>
+        <select id="location">
+            <option value="home">Home</option>
+            <option value="warehouse">Warehouse</option>
+        </select>
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" placeholder="Enter quantity" step="0.01" required>
+        <button id="saveButton">Save</button>
 
-    <!-- Form to enter product and quantity -->
-    <form id="submitForm">
-        <input type="text" id="product" placeholder="Product Name" required>
-        <input type="number" id="quantity" placeholder="Quantity" required>
-        <button type="submit">Save</button>
-    </form>
+        <h3>Product List</h3>
+        <table class="inventory-table"> 
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Home Quantity</th>
+                    <th>Warehouse Quantity</th>
+                    <th>Total Quantity</th>
+                </tr>
+            </thead>
+            <tbody id="productTable">
+                </tbody>
+        </table>
+    </div>
 
-    <!-- Table to display products -->
-    <table>
-        <thead>
-            <tr>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Date Added</th>
-            </tr>
-        </thead>
-        <tbody id="productList"></tbody>
-    </table>
-
-    <!-- Include your script here -->
-    <script src="scripts.js" nonce="randomValue12345"></script>
+    <script src="scripts.js"></script>
 </body>
 </html>
