@@ -23,10 +23,10 @@ function displayProducts() {
   products.forEach(product => {
     const row = `
       <tr>
-        <td><span class="math-inline">\{product\.name\}</td\>
-<td\></span>{product.home.toFixed(2)}</td>
-        <td><span class="math-inline">\{product\.warehouse\.toFixed\(2\)\}</td\>
-<td\></span>{product.total.toFixed(2)}</td>
+        <td>${product.name}</td>
+        <td>${product.home.toFixed(2)}</td>
+        <td>${product.warehouse.toFixed(2)}</td>
+        <td>${product.total.toFixed(2)}</td>
       </tr>
     `;
     productTable.insertAdjacentHTML('beforeend', row);
@@ -56,4 +56,15 @@ updateForm.addEventListener('submit', async (event) => {
     });
 
     if (response.ok) {
-      fetchData();
+      fetchData(); 
+      document.getElementById('productName').value = '';
+      document.getElementById('quantity').value = ''; 
+    } else {
+      console.error('Error adding product.'); 
+    } 
+  } catch (error) {
+    console.error('Error adding product:', error);
+  }
+}); // <-- Missing closing brace here
+
+fetchData();
