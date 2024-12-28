@@ -1,9 +1,16 @@
-const SHEET_API = "https://script.google.com/macros/s/AKfycbz9jXiLh0nFGAJyjsS8WD1NpPa47drriTD-qqitS4NVZo2Pwc0eRs4SMW4FleraeUcVGw/exec";
+const SHEET_API = "https://script.google.com/macros/s/AKfycbzzGeuPrZX-RkMvF2eQAci98HA6QKp2iAFN1vi8NA772wL2Fn09UQb2yOe9Yvd0rEUhVw/exec"; // Replace with your Apps Script deployment URL
 
 async function fetchInventory() {
-  const response = await fetch(SHEET_API);
-  const data = await response.json();
-  renderInventory(data);
+  try {
+    const response = await fetch(SHEET_API);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const data = await response.json();
+    renderInventory(data);
+  } catch (error) {
+    console.error("Failed to fetch inventory:", error);
+  }
 }
 
 function renderInventory(data) {
@@ -22,15 +29,21 @@ function renderInventory(data) {
 
 document.getElementById("addProductForm").addEventListener("submit", async (event) => {
   event.preventDefault();
-  const productName = document.getElementById("productName").value.toUpperCase();
+  const productName = document.getElementById("productName").value.trim().toUpperCase();
   const location = document.getElementById("location").value;
   const quantity = parseFloat(document.getElementById("quantity").value);
-  
-  await fetch(`${SHEET_API}?product=${productName}&location=${location}&quantity=${quantity}`, {
-    method: "POST",
-  });
-  
-  fetchInventory();
+
+  try {
+    const response = await fetch(`${SHEET_API}?product=${productName}&location=${location}&quantity=${quantity}`, {
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    fetchInventory();
+  } catch (error) {
+    console.error("Failed to update inventory:", error);
+  }
 });
 
 fetchInventory();
