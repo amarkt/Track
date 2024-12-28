@@ -1,59 +1,36 @@
-$(document).ready(function() {
-  fetchProductData();
+const SHEET_API = "https://script.google.com/macros/s/AKfycbz9jXiLh0nFGAJyjsS8WD1NpPa47drriTD-qqitS4NVZo2Pwc0eRs4SMW4FleraeUcVGw/exec";
 
-  $('#updateForm').submit(function(event) {
-    event.preventDefault();
-    updateProduct();
+async function fetchInventory() {
+  const response = await fetch(SHEET_API);
+  const data = await response.json();
+  renderInventory(data);
+}
+
+function renderInventory(data) {
+  const tbody = document.getElementById("inventoryBody");
+  tbody.innerHTML = "";
+  data.slice(1).forEach(row => {
+    const tr = document.createElement("tr");
+    row.forEach(cell => {
+      const td = document.createElement("td");
+      td.textContent = cell;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
   });
+}
+
+document.getElementById("addProductForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const productName = document.getElementById("productName").value.toUpperCase();
+  const location = document.getElementById("location").value;
+  const quantity = parseFloat(document.getElementById("quantity").value);
+  
+  await fetch(`${SHEET_API}?product=${productName}&location=${location}&quantity=${quantity}`, {
+    method: "POST",
+  });
+  
+  fetchInventory();
 });
 
-function fetchProductData() {
-  $.ajax({
-    url: 'https://script.google.com/macros/s/AKfycbxn42jDBqs92Bt8v3pSxhUnhxKDwcFNCRiKjzZyFEalHIn16UAeZjKq73-kzEopjraEeQ/exec',
-    type: 'GET',
-    dataType: 'json',
-    success: function(data) {
-      updateProductTable(data);
-    },
-    error: function(error) {
-      console.error('Error fetching product data:', error);
-    }
-  });
-}
-
-function updateProduct() {
-  var productName = $('#productName').val();
-  var location = $('#location').val();
-  var quantity = parseFloat($('#quantity').val());
-
-  $.ajax({
-    url: 'https://script.google.com/macros/s/YOUR-SCRIPT-ID/exec',
-    type: 'POST',
-    data: {
-      action: 'updateProduct',
-      name: productName,
-      location: location,
-      quantity: quantity
-    },
-    success: function() {
-      fetchProductData();
-      $('#updateForm')[0].reset();
-    },
-    error: function(error) {
-      console.error('Error updating product:', error);
-    }
-  });
-}
-
-function updateProductTable(data) {
-  $('#productTableBody').empty();
-
-  data.forEach(function(product) {
-    var row = $('<tr>');
-    row.append($('<td>').text(product.name));
-    row.append($('<td>').text(product.homeQuantity));
-    row.append($('<td>').text(product.warehouseQuantity));
-    row.append($('<td>').text(product.totalQuantity));
-    $('#productTableBody').append(row);
-  });
-}
+fetchInventory();
