@@ -1,4 +1,4 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwUadq6Sh10ZsubyI4eWhFH8nAEA6xHj5O5GTWnd_0nB6aK3mquytOzgOa4E1L6MBQeFA/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXR_ffqTwJ-njqMVaiKhgjGJN3lxyN2eP8Dxwn3KDP_7Dp-fMQRYbeVMOGeo7YHz-MoQ/exec'; 
 let products = []; 
 
 async function fetchData() {
@@ -56,7 +56,4 @@ updateForm.addEventListener('submit', async (event) => {
     });
 
     if (response.ok) {
-      fetchData(); 
-      document.getElementById('productName').value = '';
-      document.getElementById('quantity').value = ''; 
-    } else {
+      fetchData();
