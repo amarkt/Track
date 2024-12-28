@@ -4,12 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inventory Management</title>
-  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <h1>Inventory Management</h1>
   <div id="app">
-    <table id="inventoryTable">
+    <table id="inventoryTable" border="1">
       <thead>
         <tr>
           <th>Product Name</th>
@@ -19,12 +18,12 @@
         </tr>
       </thead>
       <tbody id="inventoryBody">
-        <!-- Data will be loaded here -->
+        <!-- Data will be dynamically loaded here -->
       </tbody>
     </table>
     
     <form id="addProductForm">
-      <h2>Add/Update Product</h2>
+      <h2>Add or Update Product</h2>
       <label for="productName">Product Name:</label>
       <input type="text" id="productName" required>
       <label for="location">Location:</label>
