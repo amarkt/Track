@@ -1,74 +1,63 @@
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('saveButton').addEventListener('click', updateQuantity);
-    loadProducts();
+const scriptUrl = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec'; 
+
+function fetchData() {
+  fetch(scriptUrl)
+    .then(response => response.json())
+    .then(data => {
+      const tableBody = document.getElementById('productTableBody');
+      tableBody.innerHTML = ''; 
+
+      data.forEach(product => {
+        const row = document.createElement('tr');
+        const productNameCell = document.createElement('td');
+        const homeQtyCell = document.createElement('td');
+        const warehouseQtyCell = document.createElement('td');
+        const totalQtyCell = document.createElement('td');
+
+        productNameCell.textContent = product[0];
+        homeQtyCell.textContent = product[1];
+        warehouseQtyCell.textContent = product[2];
+        totalQtyCell.textContent = product[3];
+
+        row.appendChild(productNameCell);
+        row.appendChild(homeQtyCell);
+        row.appendChild(warehouseQtyCell);
+        row.appendChild(totalQtyCell);
+
+        tableBody.appendChild(row);
+      });
+    })
+    .catch(error => console.error('Error fetching data:', error));
+}
+
+const addProductForm = document.getElementById('addProductForm');
+addProductForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const productName = document.getElementById('productName').value;
+  const homeQuantity = parseInt(document.getElementById('homeQuantity').value);
+  const warehouseQuantity = parseInt(document.getElementById('warehouseQuantity').value);
+
+  fetch(scriptUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      function: 'addProduct',
+      arguments: [productName, homeQuantity, warehouseQuantity]
+    })
+  })
+  .then(response => {
+    if (response.ok) {
+      fetchData();
+      document.getElementById('productName').value = '';
+      document.getElementById('homeQuantity').value = '';
+      document.getElementById('warehouseQuantity').value = '';
+    } else {
+      console.error('Error adding product.');
+    }
+  })
+  .catch(error => console.error('Error adding product:', error));
 });
 
-async function updateQuantity() {
-    const name = document.getElementById('productName').value.trim().toUpperCase();
-    const location = document.getElementById('location').value;
-    const quantity = parseFloat(document.getElementById('quantity').value);
-
-    if (!name || isNaN(quantity)) {
-        alert('Please enter valid product details.');
-        return;
-    }
-
-    // Send data to Google Apps Script for processing
-    try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbxONxZ1mcXtwFRFuFDn0gQKng_EFeA1-N1RC-EhTZbe2-Bas1Ab9fOtAMentjcTnlye-g/exec', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name, [location]: quantity }) 
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-        if (data.result === 'success') {
-            loadProducts(); // Refresh product list after successful update
-            clearForm();
-        } else {
-            alert('Error updating product: ' + data.message);
-        }
-    } catch (error) {
-        alert('Error updating product: ' + error.message);
-    }
-}
-
-async function loadProducts() {
-    try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbxONxZ1mcXtwFRFuFDn0gQKng_EFeA1-N1RC-EhTZbe2-Bas1Ab9fOtAMentjcTnlye-g/exec/getData'); // Assuming you have a separate function in your Apps Script to retrieve data
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const productsData = await response.json(); 
-        displayProducts(productsData); 
-    } catch (error) {
-        alert('Error loading products: ' + error.message);
-    }
-}
-
-function displayProducts(productsData) {
-    const productTable = document.getElementById('productTable');
-    productTable.innerHTML = ''; 
-
-    productsData.forEach(product => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${product.name}</td>
-            <td>${product.home}</td>
-            <td>${product.warehouse}</td>
-            <td>${product.home + product.warehouse}</td>
-        `;
-        productTable.appendChild(row);
-    });
-}
-
-function clearForm() {
-    document.getElementById('productName').value = '';
-    document.getElementById('quantity').value = '';
-}
+fetchData();
