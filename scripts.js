@@ -1,4 +1,4 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXR_ffqTwJ-njqMVaiKhgjGJN3lxyN2eP8Dxwn3KDP_7Dp-fMQRYbeVMOGeo7YHz-MoQ/exec'; 
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxn42jDBqs92Bt8v3pSxhUnhxKDwcFNCRiKjzZyFEalHIn16UAeZjKq73-kzEopjraEeQ/exec'; 
 let products = []; 
 
 async function fetchData() {
@@ -60,11 +60,12 @@ updateForm.addEventListener('submit', async (event) => {
       document.getElementById('productName').value = '';
       document.getElementById('quantity').value = ''; 
     } else {
-      console.error('Error adding product.'); 
+      alert('Error updating product. Please try again.'); 
     } 
   } catch (error) {
-    console.error('Error adding product:', error);
+    console.error('Error updating product:', error);
+    alert('An error occurred while updating the product.');
   }
-}); // <-- Missing closing brace here
+});
 
 fetchData();
