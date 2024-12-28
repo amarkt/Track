@@ -1,48 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline Inventory Tracker</title>
-    <style>
-        /* ... (existing CSS) ... */
-        .inventory-table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px; 
-        } 
-    </style>
+  <title>Inventory Tracker</title>
 </head>
 <body>
-    <h1>Offline Inventory Tracker</h1>
-    <div class="container">
-        <h3>Add or Update Product</h3>
-        <label for="productName">Product Name:</label>
-        <input id="productName" placeholder="Enter product name" required>
-        <label for="location">Location:</label>
-        <select id="location">
-            <option value="home">Home</option>
-            <option value="warehouse">Warehouse</option>
-        </select>
-        <label for="quantity">Quantity:</label>
-        <input type="number" id="quantity" placeholder="Enter quantity" step="0.01" required>
-        <button id="saveButton">Save</button>
 
-        <h3>Product List</h3>
-        <table class="inventory-table"> 
-            <thead>
-                <tr>
-                    <th>Product Name</th>
-                    <th>Home Quantity</th>
-                    <th>Warehouse Quantity</th>
-                    <th>Total Quantity</th>
-                </tr>
-            </thead>
-            <tbody id="productTable">
-                </tbody>
-        </table>
-    </div>
+  <h1>Product Inventory</h1>
 
-    <script src="scripts.js"></script>
+  <div id="productList">
+    <h2>Product List</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Home</th>
+          <th>Warehouse</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="productTableBody"></tbody>
+    </table>
+  </div>
+
+  <div id="addProductForm">
+    <h2>Add Product</h2>
+    <form id="addProductForm">
+      <label for="productName">Product Name:</label>
+      <input type="text" id="productName" /><br><br>
+      <label for="homeQuantity">Home Quantity:</label>
+      <input type="number" id="homeQuantity" /><br><br>
+      <label for="warehouseQuantity">Warehouse Quantity:</label>
+      <input type="number" id="warehouseQuantity" /><br><br>
+      <button type="submit">Add Product</button>
+    </form>
+  </div>
+
+  <script src="scripts.js"></script> 
+
 </body>
 </html>
