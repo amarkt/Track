@@ -1,71 +1,59 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxn42jDBqs92Bt8v3pSxhUnhxKDwcFNCRiKjzZyFEalHIn16UAeZjKq73-kzEopjraEeQ/exec'; 
-let products = []; 
+$(document).ready(function() {
+  fetchProductData();
 
-async function fetchData() {
-  try {
-    const response = await fetch(SCRIPT_URL);
-    const data = await response.json();
-    products = data.slice(1).map(row => ({ 
-      name: row[0],
-      home: parseFloat(row[1]) || 0,
-      warehouse: parseFloat(row[2]) || 0,
-      total: parseFloat(row[3]) || 0
-    }));
-    displayProducts();
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-}
+  $('#updateForm').submit(function(event) {
+    event.preventDefault();
+    updateProduct();
+  });
+});
 
-function displayProducts() {
-  const productTable = document.getElementById('productTableBody');
-  productTable.innerHTML = ''; 
-  products.forEach(product => {
-    const row = `
-      <tr>
-        <td>${product.name}</td>
-        <td>${product.home.toFixed(2)}</td>
-        <td>${product.warehouse.toFixed(2)}</td>
-        <td>${product.total.toFixed(2)}</td>
-      </tr>
-    `;
-    productTable.insertAdjacentHTML('beforeend', row);
+function fetchProductData() {
+  $.ajax({
+    url: 'https://script.google.com/macros/s/AKfycbxn42jDBqs92Bt8v3pSxhUnhxKDwcFNCRiKjzZyFEalHIn16UAeZjKq73-kzEopjraEeQ/exec',
+    type: 'GET',
+    dataType: 'json',
+    success: function(data) {
+      updateProductTable(data);
+    },
+    error: function(error) {
+      console.error('Error fetching product data:', error);
+    }
   });
 }
 
-const updateForm = document.getElementById('updateForm');
-updateForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const productName = document.getElementById('productName').value.trim();
-  const location = document.getElementById('location').value;
-  const quantity = parseFloat(document.getElementById('quantity').value);
+function updateProduct() {
+  var productName = $('#productName').val();
+  var location = $('#location').val();
+  var quantity = parseFloat($('#quantity').val());
 
-  if (!productName || isNaN(quantity)) {
-    alert('Invalid input!');
-    return;
-  }
+  $.ajax({
+    url: 'https://script.google.com/macros/s/YOUR-SCRIPT-ID/exec',
+    type: 'POST',
+    data: {
+      action: 'updateProduct',
+      name: productName,
+      location: location,
+      quantity: quantity
+    },
+    success: function() {
+      fetchProductData();
+      $('#updateForm')[0].reset();
+    },
+    error: function(error) {
+      console.error('Error updating product:', error);
+    }
+  });
+}
 
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        function: 'updateProduct',
-        arguments: [productName, location, quantity] 
-      })
-    });
+function updateProductTable(data) {
+  $('#productTableBody').empty();
 
-    if (response.ok) {
-      fetchData(); 
-      document.getElementById('productName').value = '';
-      document.getElementById('quantity').value = ''; 
-    } else {
-      alert('Error updating product. Please try again.'); 
-    } 
-  } catch (error) {
-    console.error('Error updating product:', error);
-    alert('An error occurred while updating the product.');
-  }
-});
-
-fetchData();
+  data.forEach(function(product) {
+    var row = $('<tr>');
+    row.append($('<td>').text(product.name));
+    row.append($('<td>').text(product.homeQuantity));
+    row.append($('<td>').text(product.warehouseQuantity));
+    row.append($('<td>').text(product.totalQuantity));
+    $('#productTableBody').append(row);
+  });
+}
