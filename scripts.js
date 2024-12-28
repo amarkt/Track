@@ -1,4 +1,4 @@
-const SHEET_API = "https://script.google.com/macros/s/AKfycbzzGeuPrZX-RkMvF2eQAci98HA6QKp2iAFN1vi8NA772wL2Fn09UQb2yOe9Yvd0rEUhVw/exec"; // Replace with your Apps Script deployment URL
+const SHEET_API = "https://script.google.com/macros/s/AKfycbyoyNuv--zEqI7jVSIqONnXzLaJRxKZWZ9kl1Nz7QfZJGGLsNDZMDffFUZFOBxiV31RHg/exec"; // Replace with the new deployment URL
 
 async function fetchInventory() {
   try {
